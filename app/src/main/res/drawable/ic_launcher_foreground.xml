@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Corps de l'appareil photo -->
+    <path android:fillColor="#FFFFFF"
+          android:pathData="M33,44 C33,43 34,42 35,42 L42,42 L45,36 L63,36 L66,42 L73,42 C74,42 75,43 75,44 L75,57 C75,58 74,59 73,59 L35,59 C34,59 33,58 33,57 Z"/>
+
+    <!-- Objectif (anneau vert foncé) -->
+    <path android:fillColor="#2E7D32"
+          android:pathData="M54,50 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0"/>
+
+    <!-- Objectif (centre blanc) -->
+    <path android:fillColor="#FFFFFF"
+          android:pathData="M54,50 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0"/>
+
+    <!-- Plateau de la balance (plus large) -->
+    <path android:fillColor="#FFFFFF"
+          android:pathData="M20,61 L88,61 Q88,65 86,65 L22,65 Q20,65 20,61 Z"/>
+
+    <!-- Corps de la balance -->
+    <path android:fillColor="#FFFFFF"
+          android:pathData="M30,65 L78,65 Q80,65 80,67 L80,84 Q80,86 78,86 L30,86 Q28,86 28,84 L28,67 Q28,65 30,65 Z"/>
+
+    <!-- Écran de la balance (vert foncé) -->
+    <path android:fillColor="#2E7D32"
+          android:pathData="M36,69 L72,69 L72,82 L36,82 Z"/>
+
+    <!-- Arc de cadran (blanc) -->
+    <path android:fillColor="@android:color/transparent"
+          android:strokeColor="#FFFFFF"
+          android:strokeWidth="3"
+          android:pathData="M41,80 A13,13 0 0,1 67,80"/>
+
+    <!-- Aiguille pointant vers la gauche = léger (blanc) -->
+    <path android:fillColor="@android:color/transparent"
+          android:strokeColor="#FFFFFF"
+          android:strokeWidth="2.5"
+          android:pathData="M54,80 L44,72"/>
+
+</vector>
