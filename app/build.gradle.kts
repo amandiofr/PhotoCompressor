@@ -21,8 +21,8 @@ android {
         applicationId = "com.amandiofr.photocompressor"
         minSdk        = 26
         targetSdk     = 35
-        versionCode   = 2
-        versionName   = "1.1"
+        versionCode   = 3
+        versionName   = "1.2"
     }
 
     signingConfigs {
@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.firebase.crashlytics)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.exifinterface)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)

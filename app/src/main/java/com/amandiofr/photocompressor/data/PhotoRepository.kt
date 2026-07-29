@@ -10,10 +10,12 @@ import android.os.Environment
 import android.os.StatFs
 import android.provider.MediaStore
 import android.util.Log
+import androidx.exifinterface.media.ExifInterface
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import java.lang.reflect.Modifier
 
 data class PhotoInfo(
     val uri: Uri,
@@ -78,6 +80,11 @@ class PhotoRepository(private val context: Context) {
 
     suspend fun compress(photo: PhotoInfo): CompressResult = withContext(Dispatchers.IO) {
         try {
+            // Bitmap.compress() réécrit un JPEG sans aucune métadonnée EXIF ; on
+            // capture donc tout ce qui existe AVANT d'écraser le fichier, pour
+            // le réinjecter après coup (orientation, GPS, date de prise de vue…).
+            val exifSnapshot = readExif(photo.uri)
+
             val opts = BitmapFactory.Options().apply {
                 inPreferredConfig = Bitmap.Config.RGB_565 // économie mémoire
             }
@@ -95,6 +102,7 @@ class PhotoRepository(private val context: Context) {
             if (compressed.size >= photo.sizeBytes * MIN_GAIN_RATIO) return@withContext CompressResult.SkippedNoGain
 
             writeBack(photo.uri, compressed)
+            restoreExif(photo.uri, exifSnapshot)
 
             CompressResult.Compressed(photo.sizeBytes - compressed.size)
         } catch (e: OutOfMemoryError) {
@@ -123,15 +131,55 @@ class PhotoRepository(private val context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(data) }
         } else {
-            @Suppress("DEPRECATION")
-            val path = context.contentResolver.query(
-                uri, arrayOf(MediaStore.Images.Media.DATA), null, null, null
-            )?.use { c ->
-                if (c.moveToFirst())
-                    c.getString(c.getColumnIndexOrThrow(MediaStore.Images.Media.DATA))
-                else null
+            resolveFilePath(uri)?.let { java.io.File(it).writeBytes(data) }
+        }
+    }
+
+    // Tous les tags TAG_* connus de la lib, découverts par réflexion pour ne
+    // rien oublier plutôt que de maintenir une liste à la main.
+    private val exifTags: List<String> by lazy {
+        ExifInterface::class.java.fields
+            .filter { Modifier.isStatic(it.modifiers) && it.name.startsWith("TAG_") }
+            .mapNotNull { it.get(null) as? String }
+    }
+
+    private fun readExif(uri: Uri): Map<String, String> {
+        val exif = context.contentResolver.openInputStream(uri)?.use { ExifInterface(it) } ?: return emptyMap()
+        return exifTags.mapNotNull { tag -> exif.getAttribute(tag)?.let { tag to it } }.toMap()
+    }
+
+    private fun restoreExif(uri: Uri, values: Map<String, String>) {
+        if (values.isEmpty()) return
+        try {
+            // Le descripteur doit rester ouvert jusqu'à saveAttributes() inclus :
+            // le fermer plus tôt (ex. via .use{} juste pour construire l'objet)
+            // fait échouer l'écriture avec un EBADF.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                context.contentResolver.openFileDescriptor(uri, "rw")?.use { pfd ->
+                    val exif = ExifInterface(pfd.fileDescriptor)
+                    values.forEach { (tag, value) -> exif.setAttribute(tag, value) }
+                    exif.saveAttributes()
+                }
+            } else {
+                resolveFilePath(uri)?.let { path ->
+                    val exif = ExifInterface(path)
+                    values.forEach { (tag, value) -> exif.setAttribute(tag, value) }
+                    exif.saveAttributes()
+                }
             }
-            path?.let { java.io.File(it).writeBytes(data) }
+        } catch (e: Exception) {
+            // La compression a réussi ; on ne fait pas échouer toute la photo
+            // pour une métadonnée EXIF qui n'a pas pu être réécrite.
+            Log.w(TAG, "Impossible de restaurer l'EXIF de $uri", e)
+        }
+    }
+
+    private fun resolveFilePath(uri: Uri): String? {
+        @Suppress("DEPRECATION")
+        return context.contentResolver.query(
+            uri, arrayOf(MediaStore.Images.Media.DATA), null, null, null
+        )?.use { c ->
+            if (c.moveToFirst()) c.getString(c.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)) else null
         }
     }
 }
