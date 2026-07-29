@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.Canvas
+import com.amandiofr.photocompressor.BuildConfig
 import com.amandiofr.photocompressor.viewmodel.MainViewModel
 import com.amandiofr.photocompressor.viewmodel.UiState
 
@@ -74,6 +75,15 @@ fun MainScreen(viewModel: MainViewModel) {
                     is UiState.Done   -> DoneCard(s, onReset = { viewModel.reset() })
                 }
             }
+
+            Text(
+                "v${BuildConfig.VERSION_NAME}",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 8.dp)
+            )
         }
     }
 }
@@ -205,6 +215,22 @@ private fun DoneCard(state: UiState.Done, onReset: () -> Unit) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
+        if (state.errors > 0) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "⚠️ ${state.errors} photo(s) n'ont pas pu être compressées",
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
+        }
+        if (state.total < state.scannedTotal) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "⚠️ Traitement interrompu : ${state.scannedTotal - state.total} photo(s) non traitées",
+                color = MaterialTheme.colorScheme.error,
+                textAlign = TextAlign.Center
+            )
+        }
         Spacer(Modifier.height(32.dp))
         OutlinedButton(onClick = onReset) { Text("Recommencer") }
     }

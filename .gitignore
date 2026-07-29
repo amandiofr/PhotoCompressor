@@ -1,11 +1,16 @@
+keystore/
+keystore.properties
 *.iml
 .gradle
 /local.properties
 /.idea
 .DS_Store
 /build
+**/build
 /captures
+.vscode/
 .externalNativeBuild
 .cxx
 local.properties
 app/release/
+app/google-services.json

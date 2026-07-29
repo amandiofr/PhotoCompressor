@@ -47,6 +47,13 @@ private fun PermissionGate(onGranted: @Composable () -> Unit) {
         Manifest.permission.READ_EXTERNAL_STORAGE
 
     val context = LocalContext.current
+    val permissionsToRequest = remember {
+        val list = mutableListOf(permission)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            list.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        list.toTypedArray()
+    }
     var granted by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
@@ -54,21 +61,24 @@ private fun PermissionGate(onGranted: @Composable () -> Unit) {
     }
     var showRationale by remember { mutableStateOf(false) }
 
+    // La notification de progression du service en avant-plan (compression) dépend
+    // de POST_NOTIFICATIONS sur Android 13+ ; on la demande ici sans bloquer l'accès
+    // à l'app si elle est refusée (le service continue de tourner sans notification visible).
     val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        granted = isGranted
-        if (!isGranted) showRationale = true
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        granted = results[permission] == true
+        if (!granted) showRationale = true
     }
 
-    LaunchedEffect(Unit) { if (!granted) launcher.launch(permission) }
+    LaunchedEffect(Unit) { if (!granted) launcher.launch(permissionsToRequest) }
 
     if (granted) {
         onGranted()
     } else {
         PermissionRationaleScreen(
             showRationale = showRationale,
-            onRetry = { launcher.launch(permission) }
+            onRetry = { launcher.launch(permissionsToRequest) }
         )
     }
 }
