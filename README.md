@@ -10,8 +10,9 @@ Designed for non-technical users who are running out of storage space.
 
 1. **Scans** your gallery for JPEG photos larger than 200 KB
 2. **Compresses** them to 80% JPEG quality in-place
-3. **Skips** photos where the gain would be less than 10%
-4. **Shows** how much space was freed and how it compares to your total storage
+3. **Preserves EXIF metadata** (orientation, capture date, camera model, GPS…) across the compression
+4. **Skips** photos where the gain would be less than 10%
+5. **Shows** how much space was freed and how it compares to your total storage
 
 Photos are replaced in place. There is no undo. The quality reduction is invisible to the naked eye for typical camera photos.
 
@@ -22,6 +23,7 @@ Photos are replaced in place. There is no undo. The quality reduction is invisib
 - Single-screen UI — tap once to scan, tap again to compress
 - Disk space bar: used / freed / available at a glance
 - Live progress during compression
+- EXIF metadata (orientation, GPS, capture date, camera info…) is read before compression and restored afterwards — `Bitmap.compress()` would otherwise strip it
 - Compression runs as a foreground service (WorkManager `CoroutineWorker`), so it survives the app being backgrounded on large libraries
 - Photos are processed in batches of 2000 — keeps each write-permission request well under Android's Binder transaction limit
 - Skips already-optimised photos gracefully
@@ -83,6 +85,7 @@ Release builds are signed and require `keystore.properties` + a keystore file at
 - **Background work**: WorkManager `CoroutineWorker` running as a foreground service
 - **Storage access**: `MediaStore` + `ContentResolver`
 - **Write permission**: `MediaStore.createWriteRequest()` (API 30+), requested per batch
+- **Metadata**: `androidx.exifinterface` to snapshot and restore EXIF around each compression
 - **Crash reporting**: Firebase Crashlytics
 - **Build**: AGP 8.13.2 · Gradle 8.13 · Compose BOM 2024.06.00
 
