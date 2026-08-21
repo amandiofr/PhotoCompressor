@@ -1,5 +1,7 @@
 # 📷 Photo Compressor
 
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/amandiofr)
+
 A simple Android app that compresses JPEG photos directly on the device — no cloud, no backup, no fuss.
 
 Designed for non-technical users who are running out of storage space.
