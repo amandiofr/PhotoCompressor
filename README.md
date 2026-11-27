@@ -40,6 +40,11 @@ You need an Android 8 phone or newer.
 Photo Compressor is provided as is, without any warranty. I am not responsible for any damaged or lost photos:
 that is exactly why you should back them up before using the app.
 
+## License
+
+GNU GPL v3: you are free to use, change and share this app, as long as what you share stays free and open,
+under the same license. Full text: [click here](LICENSE).
+
 ## For developers
 
 How it works, permissions and building: [click here](docs/TECHNICAL.md).
