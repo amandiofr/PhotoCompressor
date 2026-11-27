@@ -8,6 +8,11 @@ Designed for non-technical users who are running out of storage space.
 
 ---
 
+<p>
+<img src="screenshots/start.png" width="300" alt="Start screen">
+<img src="screenshots/analysis.png" width="300" alt="After the analysis">
+</p>
+
 ## What it does
 
 1. **Scans** your gallery for JPEG photos larger than 200 KB
