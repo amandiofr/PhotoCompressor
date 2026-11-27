@@ -4,6 +4,7 @@ import android.app.Notification
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -13,7 +14,6 @@ import com.amandiofr.photocompressor.PhotoCompressorApp
 import com.amandiofr.photocompressor.R
 import com.amandiofr.photocompressor.data.CompressResult
 import com.amandiofr.photocompressor.data.PhotoRepository
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 /**
  * Compresse un lot de photos en tant que service en avant-plan : sans ça, le
@@ -34,14 +34,11 @@ class CompressionWorker(
         // traiter. Échouer explicitement évite de faire croire à la ViewModel
         // que ce lot a été compressé alors qu'il n'a jamais été touché.
         val batch = CompressionQueue.get(id) ?: run {
-            FirebaseCrashlytics.getInstance().recordException(
-                IllegalStateException("CompressionQueue vide pour le Worker $id — le process a probablement été tué avant la reprise")
-            )
+            Log.w(TAG, "CompressionQueue vide pour le Worker $id — le process a probablement été tué avant la reprise")
             return Result.failure()
         }
 
         try {
-            FirebaseCrashlytics.getInstance().log("Début du lot de ${batch.size} photos")
             setForeground(foregroundInfo(0, batch.size))
 
             var saved   = 0L
@@ -76,8 +73,8 @@ class CompressionWorker(
 
     private fun foregroundInfo(done: Int, total: Int): ForegroundInfo {
         val notification: Notification = NotificationCompat.Builder(applicationContext, PhotoCompressorApp.CHANNEL_ID)
-            .setContentTitle("Compression des photos")
-            .setContentText("$done / $total photos traitées")
+            .setContentTitle(applicationContext.getString(R.string.notif_title))
+            .setContentText(applicationContext.getString(R.string.notif_progress, done, total))
             .setSmallIcon(R.mipmap.ic_launcher)
             .setOngoing(true)
             .setProgress(total, done, false)
@@ -91,6 +88,7 @@ class CompressionWorker(
     }
 
     companion object {
+        private const val TAG = "CompressionWorker"
         private const val NOTIFICATION_ID = 42
         const val KEY_DONE    = "done"
         const val KEY_SAVED   = "saved"

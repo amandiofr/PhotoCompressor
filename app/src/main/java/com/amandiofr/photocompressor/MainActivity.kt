@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -94,19 +95,19 @@ private fun PermissionRationaleScreen(showRationale: Boolean, onRetry: () -> Uni
                 Text("🔒", fontSize = 64.sp)
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    "Accès aux photos nécessaire",
+                    stringResource(R.string.permission_title),
                     style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center
                 )
                 if (showRationale) {
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        "L'application a besoin d'accéder à vos photos pour les compresser.\nAutorisation refusée.",
+                        stringResource(R.string.permission_denied),
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(Modifier.height(24.dp))
-                    Button(onClick = onRetry) { Text("Réessayer") }
+                    Button(onClick = onRetry) { Text(stringResource(R.string.retry)) }
                 }
             }
         }

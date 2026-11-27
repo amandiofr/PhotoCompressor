@@ -20,19 +20,25 @@ You need an Android 8 phone or newer.
 
 ## Use
 
-1. Open Photo Compressor and tap **Analyser mes photos** (analyse my photos).
+1. Open Photo Compressor and tap **Analyze my photos**.
    It shows how many photos can be compressed and how much space your phone has left.
-2. Tap **Compresser** (compress). Android asks for permission to modify your photos: allow it.
+2. Tap **Compress**. Android asks for permission to modify your photos: allow it.
 3. At the end, the app shows how much space was freed.
 
 ## Good to know
 
 - **There is no undo**: the photos are replaced by their compressed version. The difference can't be seen with the
-  naked eye, but if some photos really matter to you, keep a copy elsewhere first.
+  naked eye, but **back up your photos before compressing them** (computer, cloud, memory card…).
 - The date, place and orientation of each photo are kept.
 - Only JPEG photos are compressed: not PNG, HEIC or videos.
 - Photos that are already light are left alone.
 - With many photos, compression goes on even if you leave the app.
+- The app is in English, or in French if your phone is set to French.
+
+## Disclaimer
+
+Photo Compressor is provided as is, without any warranty. I am not responsible for any damaged or lost photos:
+that is exactly why you should back them up before using the app.
 
 ## For developers
 

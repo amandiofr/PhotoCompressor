@@ -17,6 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,7 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import com.amandiofr.photocompressor.BuildConfig
+import com.amandiofr.photocompressor.R
 import com.amandiofr.photocompressor.viewmodel.MainViewModel
 import com.amandiofr.photocompressor.viewmodel.UiState
 
@@ -53,36 +58,46 @@ fun MainScreen(viewModel: MainViewModel) {
     }
 
     Scaffold { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(24.dp),
-            contentAlignment = Alignment.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AnimatedContent(
-                targetState = state,
-                contentKey = { it::class },
-                transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(300)) },
-                label = "state"
-            ) { s ->
-                when (s) {
-                    UiState.Idle      -> IdleCard(onScan = { viewModel.scan() })
-                    UiState.Scanning  -> ScanningCard()
-                    is UiState.Ready  -> ReadyCard(s, onCompress = { viewModel.requestCompression() })
-                    is UiState.WaitingForPermission -> ScanningCard() // attend le dialog système
-                    is UiState.Compressing -> CompressingCard(s)
-                    is UiState.Done   -> DoneCard(s, onReset = { viewModel.reset() })
+            // Défilable si la carte dépasse l'écran (grande taille de police), centrée sinon
+            BoxWithConstraints(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .heightIn(min = maxHeight),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AnimatedContent(
+                        targetState = state,
+                        contentKey = { it::class },
+                        transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(300)) },
+                        label = "state"
+                    ) { s ->
+                        when (s) {
+                            UiState.Idle      -> IdleCard(onScan = { viewModel.scan() })
+                            UiState.Scanning  -> ScanningCard()
+                            is UiState.Ready  -> ReadyCard(s, onCompress = { viewModel.requestCompression() })
+                            is UiState.WaitingForPermission -> ScanningCard() // attend le dialog système
+                            is UiState.Compressing -> CompressingCard(s)
+                            is UiState.Done   -> DoneCard(s, onReset = { viewModel.reset() })
+                        }
+                    }
                 }
             }
 
+            // Sous la carte (et non superposé) pour ne jamais la chevaucher quand elle est haute
             Text(
                 "v${BuildConfig.VERSION_NAME}",
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 8.dp)
+                modifier = Modifier.padding(top = 8.dp)
             )
         }
     }
@@ -96,19 +111,19 @@ private fun IdleCard(onScan: () -> Unit) {
         Text("📷", fontSize = 64.sp)
         Spacer(Modifier.height(16.dp))
         Text(
-            "Libérer de la place",
+            stringResource(R.string.idle_title),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "L'app va analyser et compresser vos photos JPEG\nsans perte de qualité visible.",
+            stringResource(R.string.idle_body),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(Modifier.height(32.dp))
-        BigButton("Analyser mes photos", onClick = onScan)
+        BigButton(stringResource(R.string.idle_button), onClick = onScan)
     }
 }
 
@@ -117,7 +132,7 @@ private fun ScanningCard() {
     CenteredCard {
         CircularProgressIndicator(Modifier.size(56.dp))
         Spacer(Modifier.height(24.dp))
-        Text("Analyse en cours…", style = MaterialTheme.typography.bodyLarge)
+        Text(stringResource(R.string.scanning), style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -127,14 +142,14 @@ private fun ReadyCard(state: UiState.Ready, onCompress: () -> Unit) {
         Text("🔍", fontSize = 56.sp)
         Spacer(Modifier.height(16.dp))
         Text(
-            "${state.photoCount} photos trouvées",
+            pluralStringResource(R.plurals.photos_found, state.photoCount, state.photoCount),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "${formatBytes(state.totalBytes)} de photos",
+            stringResource(R.string.photos_total_size, formatBytes(state.totalBytes)),
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
@@ -147,12 +162,19 @@ private fun ReadyCard(state: UiState.Ready, onCompress: () -> Unit) {
         Spacer(Modifier.height(24.dp))
         if (state.photoCount == 0) {
             Text(
-                "Aucune photo à compresser — tout est déjà optimisé !",
+                stringResource(R.string.nothing_to_compress_found),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.primary
             )
         } else {
-            BigButton("Compresser", onClick = onCompress)
+            Text(
+                stringResource(R.string.backup_warning),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Spacer(Modifier.height(16.dp))
+            BigButton(stringResource(R.string.compress_button), onClick = onCompress)
         }
     }
 }
@@ -164,7 +186,7 @@ private fun CompressingCard(state: UiState.Compressing) {
         Text("⚙️", fontSize = 56.sp)
         Spacer(Modifier.height(16.dp))
         Text(
-            "Compression en cours…",
+            stringResource(R.string.compressing),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
@@ -173,13 +195,13 @@ private fun CompressingCard(state: UiState.Compressing) {
         LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(12.dp))
         Text(
-            "${state.done} / ${state.total} photos",
+            stringResource(R.string.progress_photos, state.done, state.total),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         if (state.savedBytes > 0) {
             Spacer(Modifier.height(4.dp))
             Text(
-                "${formatBytes(state.savedBytes)} récupérés",
+                stringResource(R.string.bytes_recovered, formatBytes(state.savedBytes)),
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold
             )
@@ -193,8 +215,8 @@ private fun DoneCard(state: UiState.Done, onReset: () -> Unit) {
         Text("✅", fontSize = 56.sp)
         Spacer(Modifier.height(16.dp))
         Text(
-            if (state.savedBytes > 0) "${formatBytes(state.savedBytes)} libérés !"
-            else "Rien à compresser",
+            if (state.savedBytes > 0) stringResource(R.string.bytes_freed, formatBytes(state.savedBytes))
+            else stringResource(R.string.nothing_compressed),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
@@ -210,29 +232,30 @@ private fun DoneCard(state: UiState.Done, onReset: () -> Unit) {
         )
         Spacer(Modifier.height(8.dp))
         Text(
-            "${state.total} photos traitées" +
-                if (state.skipped > 0) " · ${state.skipped} déjà optimisées" else "",
+            pluralStringResource(R.plurals.photos_processed, state.total, state.total) +
+                if (state.skipped > 0) " · " + pluralStringResource(R.plurals.already_optimized, state.skipped, state.skipped) else "",
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
         if (state.errors > 0) {
             Spacer(Modifier.height(4.dp))
             Text(
-                "⚠️ ${state.errors} photo(s) n'ont pas pu être compressées",
+                pluralStringResource(R.plurals.errors_count, state.errors, state.errors),
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center
             )
         }
         if (state.total < state.scannedTotal) {
+            val notProcessed = state.scannedTotal - state.total
             Spacer(Modifier.height(4.dp))
             Text(
-                "⚠️ Traitement interrompu : ${state.scannedTotal - state.total} photo(s) non traitées",
+                pluralStringResource(R.plurals.interrupted_count, notProcessed, notProcessed),
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center
             )
         }
         Spacer(Modifier.height(32.dp))
-        OutlinedButton(onClick = onReset) { Text("Recommencer") }
+        OutlinedButton(onClick = onReset) { Text(stringResource(R.string.restart)) }
     }
 }
 
@@ -259,10 +282,10 @@ private fun CenteredCard(content: @Composable ColumnScope.() -> Unit) {
 private fun BigButton(label: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth().height(56.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
-        Text(label, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(label, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
     }
 }
 
@@ -306,12 +329,12 @@ private fun DiskSpaceBar(
         Spacer(Modifier.height(4.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(
-                "${formatBytes(totalBytes - freeBytes)} utilisés",
+                stringResource(R.string.disk_used, formatBytes(totalBytes - freeBytes)),
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                "${formatBytes(freeBytes)} libres",
+                stringResource(R.string.disk_free, formatBytes(freeBytes)),
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold
@@ -320,8 +343,9 @@ private fun DiskSpaceBar(
     }
 }
 
+@Composable
 private fun formatBytes(bytes: Long): String = when {
-    bytes >= 1_073_741_824L -> "%.1f Go".format(bytes / 1_073_741_824.0)
-    bytes >= 1_048_576L     -> "%.0f Mo".format(bytes / 1_048_576.0)
-    else                    -> "%.0f Ko".format(bytes / 1_024.0)
+    bytes >= 1_073_741_824L -> stringResource(R.string.unit_gb, bytes / 1_073_741_824.0)
+    bytes >= 1_048_576L     -> stringResource(R.string.unit_mb, bytes / 1_048_576.0)
+    else                    -> stringResource(R.string.unit_kb, bytes / 1_024.0)
 }

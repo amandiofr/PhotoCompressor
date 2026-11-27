@@ -11,7 +11,6 @@ import android.os.StatFs
 import android.provider.MediaStore
 import android.util.Log
 import androidx.exifinterface.media.ExifInterface
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -90,7 +89,7 @@ class PhotoRepository(private val context: Context) {
             }
             val bitmap = context.contentResolver.openInputStream(photo.uri)
                 ?.use { BitmapFactory.decodeStream(it, null, opts) }
-                ?: return@withContext CompressResult.Error("Fichier illisible : ${photo.displayName}")
+                ?: return@withContext CompressResult.Error("Unreadable file: ${photo.displayName}")
 
             val buf = ByteArrayOutputStream()
             bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, buf)
@@ -107,24 +106,11 @@ class PhotoRepository(private val context: Context) {
             CompressResult.Compressed(photo.sizeBytes - compressed.size)
         } catch (e: OutOfMemoryError) {
             Log.e(TAG, "Mémoire insuffisante pour compresser ${photo.displayName} (${photo.sizeBytes} o)", e)
-            recordNonFatal(e, photo)
-            CompressResult.Error("Mémoire insuffisante : ${photo.displayName}")
+            CompressResult.Error("Out of memory: ${photo.displayName}")
         } catch (e: Exception) {
             Log.e(TAG, "Échec de compression de ${photo.displayName}", e)
-            recordNonFatal(e, photo)
             CompressResult.Error(e.message ?: photo.displayName)
         }
-    }
-
-    // Ces échecs sont rattrapés pour ne jamais faire planter l'appli (cf. le
-    // bug historique de crash silencieux sur les grosses bibliothèques), donc
-    // sans ça ils ne remonteraient nulle part : on les logge comme non-fatals
-    // dans Crashlytics pour garder une trace exploitable.
-    private fun recordNonFatal(t: Throwable, photo: PhotoInfo) {
-        val crashlytics = FirebaseCrashlytics.getInstance()
-        crashlytics.setCustomKey("photo_name", photo.displayName)
-        crashlytics.setCustomKey("photo_size_bytes", photo.sizeBytes)
-        crashlytics.recordException(t)
     }
 
     private fun writeBack(uri: Uri, data: ByteArray) {

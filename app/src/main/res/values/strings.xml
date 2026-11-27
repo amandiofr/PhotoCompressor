@@ -1,4 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Photo Compressor</string>
+    <string name="app_name" translatable="false">Photo Compressor</string>
+
+    <!-- Permission screen -->
+    <string name="permission_title">Photo access required</string>
+    <string name="permission_denied">The app needs access to your photos to compress them.\nPermission denied.</string>
+    <string name="retry">Retry</string>
+
+    <!-- Start -->
+    <string name="idle_title">Free up space</string>
+    <string name="idle_body">The app will analyze and compress your JPEG photos\nwith no visible loss of quality.</string>
+    <string name="idle_button">Analyze my photos</string>
+
+    <!-- Analysis -->
+    <string name="scanning">Analyzing…</string>
+    <plurals name="photos_found">
+        <item quantity="one">%d photo found</item>
+        <item quantity="other">%d photos found</item>
+    </plurals>
+    <string name="photos_total_size">%s of photos</string>
+    <string name="nothing_to_compress_found">No photos to compress — everything is already optimized!</string>
+    <string name="compress_button">Compress</string>
+    <string name="backup_warning">⚠️ Your photos will be overwritten with their compressed version. Back them up first if they matter to you.</string>
+
+    <!-- Compression -->
+    <string name="compressing">Compressing…</string>
+    <string name="progress_photos">%1$d / %2$d photos</string>
+    <string name="bytes_recovered">%s recovered</string>
+
+    <!-- Done -->
+    <string name="bytes_freed">%s freed!</string>
+    <string name="nothing_compressed">Nothing to compress</string>
+    <plurals name="photos_processed">
+        <item quantity="one">%d photo processed</item>
+        <item quantity="other">%d photos processed</item>
+    </plurals>
+    <plurals name="already_optimized">
+        <item quantity="one">%d already optimized</item>
+        <item quantity="other">%d already optimized</item>
+    </plurals>
+    <plurals name="errors_count">
+        <item quantity="one">⚠️ %d photo could not be compressed</item>
+        <item quantity="other">⚠️ %d photos could not be compressed</item>
+    </plurals>
+    <plurals name="interrupted_count">
+        <item quantity="one">⚠️ Processing interrupted: %d photo not processed</item>
+        <item quantity="other">⚠️ Processing interrupted: %d photos not processed</item>
+    </plurals>
+    <string name="restart">Start over</string>
+
+    <!-- Disk bar -->
+    <string name="disk_used">%s used</string>
+    <string name="disk_free">%s free</string>
+
+    <!-- Units -->
+    <string name="unit_gb">%.1f GB</string>
+    <string name="unit_mb">%.0f MB</string>
+    <string name="unit_kb">%.0f KB</string>
+
+    <!-- Notification -->
+    <string name="notif_channel_name">Photo compression</string>
+    <string name="notif_channel_description">Background compression progress</string>
+    <string name="notif_title">Compressing photos</string>
+    <string name="notif_progress">%1$d / %2$d photos processed</string>
 </resources>

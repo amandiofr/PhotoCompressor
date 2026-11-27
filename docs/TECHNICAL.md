@@ -18,7 +18,7 @@
 - Compression failures (including out-of-memory) are counted and shown to the user instead of being silently
   swallowed.
 - Safe on low memory: uses `RGB_565` decoding and catches `OutOfMemoryError`.
-- Crash and non-fatal error reporting via Firebase Crashlytics.
+- UI in English (default) and French (`values-fr`), picked from the phone's language.
 
 ## Requirements
 
@@ -54,10 +54,6 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Requires Android Studio Meerkat or later, or a local Android SDK with `ANDROID_HOME` set.
 
-Also requires a `google-services.json` file in `app/` (Firebase Crashlytics), not included in the repo. Get your
-own from the [Firebase console](https://console.firebase.google.com) (package name `com.amandiofr.photocompressor`)
-and drop it in `app/google-services.json`; the build fails without it.
-
 Release builds are signed and require `keystore.properties` + a keystore file at the repo root (also not included,
 see `.gitignore`).
 
@@ -69,5 +65,4 @@ see `.gitignore`).
 - **Storage access**: `MediaStore` + `ContentResolver`
 - **Write permission**: `MediaStore.createWriteRequest()` (API 30+), requested per batch
 - **Metadata**: `androidx.exifinterface` to snapshot and restore EXIF around each compression
-- **Crash reporting**: Firebase Crashlytics
 - **Build**: AGP 8.13.2 · Gradle 8.13 · Compose BOM 2024.06.00

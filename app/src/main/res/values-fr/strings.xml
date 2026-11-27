@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Écran de permission -->
+    <string name="permission_title">Accès aux photos nécessaire</string>
+    <string name="permission_denied">L\'application a besoin d\'accéder à vos photos pour les compresser.\nAutorisation refusée.</string>
+    <string name="retry">Réessayer</string>
+
+    <!-- Accueil -->
+    <string name="idle_title">Libérer de la place</string>
+    <string name="idle_body">L\'app va analyser et compresser vos photos JPEG\nsans perte de qualité visible.</string>
+    <string name="idle_button">Analyser mes photos</string>
+
+    <!-- Analyse -->
+    <string name="scanning">Analyse en cours…</string>
+    <plurals name="photos_found">
+        <item quantity="one">%d photo trouvée</item>
+        <item quantity="many">%d photos trouvées</item>
+        <item quantity="other">%d photos trouvées</item>
+    </plurals>
+    <string name="photos_total_size">%s de photos</string>
+    <string name="nothing_to_compress_found">Aucune photo à compresser — tout est déjà optimisé !</string>
+    <string name="compress_button">Compresser</string>
+    <string name="backup_warning">⚠️ Vos photos vont être remplacées par leur version compressée. Sauvegardez-les avant si elles comptent pour vous.</string>
+
+    <!-- Compression -->
+    <string name="compressing">Compression en cours…</string>
+    <string name="progress_photos">%1$d / %2$d photos</string>
+    <string name="bytes_recovered">%s récupérés</string>
+
+    <!-- Terminé -->
+    <string name="bytes_freed">%s libérés !</string>
+    <string name="nothing_compressed">Rien à compresser</string>
+    <plurals name="photos_processed">
+        <item quantity="one">%d photo traitée</item>
+        <item quantity="many">%d photos traitées</item>
+        <item quantity="other">%d photos traitées</item>
+    </plurals>
+    <plurals name="already_optimized">
+        <item quantity="one">%d déjà optimisée</item>
+        <item quantity="many">%d déjà optimisées</item>
+        <item quantity="other">%d déjà optimisées</item>
+    </plurals>
+    <plurals name="errors_count">
+        <item quantity="one">⚠️ %d photo n\'a pas pu être compressée</item>
+        <item quantity="many">⚠️ %d photos n\'ont pas pu être compressées</item>
+        <item quantity="other">⚠️ %d photos n\'ont pas pu être compressées</item>
+    </plurals>
+    <plurals name="interrupted_count">
+        <item quantity="one">⚠️ Traitement interrompu : %d photo non traitée</item>
+        <item quantity="many">⚠️ Traitement interrompu : %d photos non traitées</item>
+        <item quantity="other">⚠️ Traitement interrompu : %d photos non traitées</item>
+    </plurals>
+    <string name="restart">Recommencer</string>
+
+    <!-- Barre disque -->
+    <string name="disk_used">%s utilisés</string>
+    <string name="disk_free">%s libres</string>
+
+    <!-- Unités -->
+    <string name="unit_gb">%.1f Go</string>
+    <string name="unit_mb">%.0f Mo</string>
+    <string name="unit_kb">%.0f Ko</string>
+
+    <!-- Notification -->
+    <string name="notif_channel_name">Compression des photos</string>
+    <string name="notif_channel_description">Progression de la compression en arrière-plan</string>
+    <string name="notif_title">Compression des photos</string>
+    <string name="notif_progress">%1$d / %2$d photos traitées</string>
+</resources>
